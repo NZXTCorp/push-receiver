@@ -8,8 +8,8 @@ if (!senderId) {
 
 (async () => {
   try {
-    await register(senderId);
-    console.log('Successfully registered');
+    const result = await register(senderId);
+    console.log('Successfully registered', result);
   } catch (e) {
     console.error('Error during registration');
     console.error(e);

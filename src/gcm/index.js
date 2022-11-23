@@ -8,8 +8,8 @@ const { toBase64 } = require('../utils/base64');
 
 // Hack to fix PHONE_REGISTRATION_ERROR #17 when bundled with webpack
 // https://github.com/dcodeIO/protobuf.js#browserify-integration
-protobuf.util.Long = Long
-protobuf.configure()
+protobuf.util.Long = Long;
+protobuf.configure();
 
 const serverKey = toBase64(Buffer.from(fcmKey));
 
@@ -39,10 +39,11 @@ async function checkIn(androidId, securityToken) {
     headers : {
       'Content-Type' : 'application/x-protobuf',
     },
-    body     : buffer,
-    encoding : null,
+    data         : buffer,
+    encoding     : null,
+    responseType : 'arraybuffer',
   });
-  const message = AndroidCheckinResponse.decode(body);
+  const message = AndroidCheckinResponse.decode(body.data);
   const object = AndroidCheckinResponse.toObject(message, {
     longs : String,
     enums : String,
@@ -69,17 +70,20 @@ async function doRegister({ androidId, securityToken }, appId) {
 }
 
 async function postRegister({ androidId, securityToken, body, retry = 0 }) {
+  const requestBody = new URLSearchParams(body);
   const response = await request({
     url     : REGISTER_URL,
     method  : 'POST',
     headers : {
-      Authorization  : `AidLogin ${androidId}:${securityToken}`,
-      'Content-Type' : 'application/x-www-form-urlencoded',
+      Authorization    : `AidLogin ${androidId}:${securityToken}`,
+      'Content-Length' : requestBody.toString().length,
+      'Content-Type'   : 'application/x-www-form-urlencoded',
     },
-    form : body,
+    data : requestBody,
   });
-  if (response.includes('Error')) {
-    console.warn(`Register request has failed with ${response}`);
+
+  if (/^Error/.test(response.data) || response.status !== 200) {
+    console.warn(`Register request has failed with ${response.data}`);
     if (retry >= 5) {
       throw new Error('GCM register has failed');
     }
@@ -87,7 +91,7 @@ async function postRegister({ androidId, securityToken, body, retry = 0 }) {
     await waitFor(1000);
     return postRegister({ androidId, securityToken, body, retry : retry + 1 });
   }
-  return response;
+  return response.data;
 }
 
 async function loadProtoFile() {
