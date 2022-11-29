@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const EventEmitter = require('events');
 const Long = require('long');
 const Parser = require('./parser');
@@ -136,15 +137,15 @@ module.exports = class Client extends EventEmitter {
   }
 
   _onSocketClose() {
-    this.emit('disconnect')
+    this.emit('disconnect');
     this._retry();
   }
 
-  _onSocketError(error) {
+  _onSocketError(_error) {
     // ignore, the close handler takes care of retry
   }
 
-  _onParserError(error) {
+  _onParserError(_error) {
     this._retry();
   }
 
