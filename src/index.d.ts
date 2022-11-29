@@ -1,6 +1,6 @@
 import EventEmitter from "events";
 
-export interface Credentails {
+export interface Credentials {
   gcm: {
     token: string;
     androidId: string;
@@ -36,13 +36,13 @@ export interface Notification {
 }
 
 export class Client extends EventEmitter {
-  public constructor(credentials: Credentails, persistentIds: string[])
+  public constructor(credentials: Credentials, persistentIds: string[])
   public destroy(): void
 }
 
-export function register(senderId: string): Credentails;
+export function register(senderId: string): Credentials;
 
-export function listener(
-  credentails: Credentails,
+export async function listen(
+  credentails: Credentials,
   notificationCallback: (notification: Notification) => void
-): Client;
+): Promise<Client>;
