@@ -40,7 +40,7 @@ export class Client extends EventEmitter {
   public destroy(): void
 }
 
-export function register(senderId: string): Credentials;
+export function register(senderId: string): Credentials | null;
 
 export async function listen(
   credentails: Credentials,

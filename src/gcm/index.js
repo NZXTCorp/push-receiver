@@ -25,9 +25,18 @@ module.exports = {
 };
 
 async function register(appId) {
-  const options = await checkIn();
-  const credentials = await doRegister(options, appId);
-  return credentials;
+  try {
+    const options = await checkIn();
+    if (options) {
+      const credentials = await doRegister(options, appId);
+      if (credentials) {
+        return credentials;
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }
 
 async function checkIn(androidId, securityToken) {
@@ -43,13 +52,16 @@ async function checkIn(androidId, securityToken) {
     encoding     : null,
     responseType : 'arraybuffer',
   });
-  const message = AndroidCheckinResponse.decode(body.data);
-  const object = AndroidCheckinResponse.toObject(message, {
-    longs : String,
-    enums : String,
-    bytes : String,
-  });
-  return object;
+  if (body?.data) {
+    const message = AndroidCheckinResponse.decode(body.data);
+    const object = AndroidCheckinResponse.toObject(message, {
+      longs : String,
+      enums : String,
+      bytes : String,
+    });
+    return object;
+  }
+  return null;
 }
 
 async function doRegister({ androidId, securityToken }, appId) {

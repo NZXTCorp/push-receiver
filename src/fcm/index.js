@@ -33,10 +33,13 @@ async function registerFCM({ senderId, token }) {
     },
   });
 
-  return {
-    keys,
-    fcm : response.data,
-  };
+  if (response?.data) {
+    return {
+      keys,
+      fcm : response.data,
+    };
+  }
+  return null;
 }
 
 function createKeys() {
