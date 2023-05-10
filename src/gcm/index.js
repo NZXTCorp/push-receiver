@@ -40,6 +40,8 @@ async function register(appId) {
 }
 
 async function checkIn(androidId, securityToken) {
+  try {
+    
   await loadProtoFile();
   const buffer = getCheckinRequest(androidId, securityToken);
   const body = await request({
@@ -62,6 +64,10 @@ async function checkIn(androidId, securityToken) {
     return object;
   }
   return null;
+  } catch (err) {
+    console.warn(err);
+    return null;
+  }
 }
 
 async function doRegister({ androidId, securityToken }, appId) {
@@ -82,28 +88,34 @@ async function doRegister({ androidId, securityToken }, appId) {
 }
 
 async function postRegister({ androidId, securityToken, body, retry = 0 }) {
-  const requestBody = new URLSearchParams(body);
-  const response = await request({
-    url     : REGISTER_URL,
-    method  : 'POST',
-    headers : {
-      Authorization    : `AidLogin ${androidId}:${securityToken}`,
-      'Content-Length' : requestBody.toString().length,
-      'Content-Type'   : 'application/x-www-form-urlencoded',
-    },
-    data : requestBody,
-  });
+  try {
+    const requestBody = new URLSearchParams(body);
+    const response = await request({
+      url     : REGISTER_URL,
+      method  : 'POST',
+      headers : {
+        Authorization    : `AidLogin ${androidId}:${securityToken}`,
+        'Content-Length' : requestBody.toString().length,
+        'Content-Type'   : 'application/x-www-form-urlencoded',
+      },
+      data : requestBody,
+    });
 
-  if (/^Error/.test(response.data) || response.status !== 200) {
-    console.warn(`Register request has failed with ${response.data}`);
-    if (retry >= 5) {
-      throw new Error('GCM register has failed');
+    if (/^Error/.test(response.data) || response.status !== 200) {
+      console.warn(`Register request has failed with ${response.data}`);
+      if (retry >= 5) {
+        throw new Error('GCM register has failed');
+      }
+      console.warn(`Retry... ${retry + 1}`);
+      await waitFor(1000);
+      return postRegister({ androidId, securityToken, body, retry : retry + 1 });
     }
-    console.warn(`Retry... ${retry + 1}`);
-    await waitFor(1000);
-    return postRegister({ androidId, securityToken, body, retry : retry + 1 });
+    
+    return response.data;
+  } catch (err) {
+    console.warn(err);
+    return null;
   }
-  return response.data;
 }
 
 async function loadProtoFile() {
