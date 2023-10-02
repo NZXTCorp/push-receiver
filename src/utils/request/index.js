@@ -6,19 +6,20 @@ const MAX_RETRY_TIMEOUT = 15;
 // Step in seconds
 const RETRY_STEP = 5;
 
-module.exports = requestWithRety;
+module.exports = requestWithRetry;
 
-function requestWithRety(...args) {
+function requestWithRetry(...args) {
   return retry(0, ...args);
 }
 
 async function retry(retryCount = 0, ...args) {
-  return await axios(...args).catch(async e => {
-    const timeout = Math.min(retryCount * RETRY_STEP, MAX_RETRY_TIMEOUT);
-    console.error(`Request failed : ${e.message}`);
-    console.error(`Retrying in ${timeout} seconds`);
-    await waitFor(timeout * 1000);
-    const result = await retry(retryCount + 1, ...args);
-    return result;
-  });
+  try {
+      return await axios(...args)
+  } catch (e) {
+      const timeout = Math.min(retryCount * RETRY_STEP, MAX_RETRY_TIMEOUT);
+      console.error(`Request failed : ${e.message}`);
+      console.error(`Retrying in ${timeout} seconds`);
+      await waitFor(timeout * 1000);
+      return await retry(retryCount + 1, ...args);
+  }
 }
