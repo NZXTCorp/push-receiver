@@ -1,18 +1,18 @@
 import EventEmitter from "events";
 
 export interface Credentials {
-  gcm: {
+  gcm?: {
     token: string;
     androidId: string;
     securityToken: string;
     appId: string;
   };
-  keys: {
+  keys?: {
     privateKey: string;
     publicKey: string;
     authSecret: string;
   };
-  fcm: {
+  fcm?: {
     token: string;
     pushSet: string;
   };
@@ -40,7 +40,7 @@ export class Client extends EventEmitter {
   public destroy(): void
 }
 
-export function register(senderId: string): Credentials | null;
+export async function register(senderId: string): Promise<Credentials | null>;
 
 export async function listen(
   credentails: Credentials,
