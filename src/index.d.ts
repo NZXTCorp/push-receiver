@@ -2,19 +2,19 @@ import EventEmitter from "events";
 
 export interface Credentials {
   gcm?: {
-    token: string;
-    androidId: string;
-    securityToken: string;
-    appId: string;
+    token?: string;
+    androidId?: string;
+    securityToken?: string;
+    appId?: string;
   };
   keys?: {
-    privateKey: string;
-    publicKey: string;
-    authSecret: string;
+    privateKey?: string;
+    publicKey?: string;
+    authSecret?: string;
   };
   fcm?: {
-    token: string;
-    pushSet: string;
+    token?: string;
+    pushSet?: string;
   };
 }
 
