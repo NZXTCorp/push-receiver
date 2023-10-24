@@ -1,6 +1,6 @@
 {
   "name": "@nzxt/push-receiver",
-  "version": "2.2.9",
+  "version": "2.3.0",
   "description": "A module to subscribe to GCM/FCM and receive notifications within a node process.",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
